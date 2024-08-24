@@ -2,6 +2,8 @@ import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import AppError from "../utils/AppError.js";
 import JWT from "jsonwebtoken";
+import { randomInt } from "crypto";
+import crypto from "crypto";
 
 const userSchema = new Schema(
   {
@@ -39,6 +41,8 @@ const userSchema = new Schema(
         type: String,
       },
     },
+    forgotPasswordOtp: String,
+    forgotPasswordExpiry: Date,
   },
   {
     timestamps: true,
@@ -72,6 +76,30 @@ userSchema.methods = {
       { expiresIn: "90d" }
     );
   },
+
+  //Forgot & Reset Password
+  generatePasswordResetOtp: async function () {
+    const resetOtp = randomInt(100000, 1000000).toString(); // This generates a 6-digit OTP
+    this.forgotPasswordOtp = crypto
+      .createHash("sha256")
+      .update(resetOtp)
+      .digest("hex");
+    this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+    return resetOtp;
+  },
+
+  //--------------------------------------------------
+  // generatePasswordResetToken: async function () {
+  //   const resetToken = crypto.randomBytes(20).toString("hex");
+
+  //   this.forgotPasswordToken = crypto
+  //     .createHash("sha256")
+  //     .update(resetToken)
+  //     .digest("hex");
+  //   this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+  //   return resetToken;
+  // },
+  //--------------------------------------------------
 };
 
 const User = model("User", userSchema);
