@@ -39,7 +39,7 @@ TextbookNest was created as a full-stack web application to showcase my skills i
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/textbooknest.git
+   git clone https://github.com/anilmoharanaofficial/textbooknest.git
    cd textbooknest
    ```
 2. **Install dependencies:**
