@@ -4,6 +4,7 @@ import catchAsync from "../utils/catchAsync.js";
 import sendResponse from "../utils/sendResponse.js";
 import validateEmail from "../utils/validateEmail.js";
 import validateUser from "../utils/validateUser.js";
+import bcrypt from "bcrypt";
 
 /////////////////////////////////////
 // Cookie Options
@@ -54,7 +55,24 @@ const signup = catchAsync(async (req, res, next) => {
 
 /////////////////////////////////////////////
 //SIGNIN CONTROLLER
-const login = catchAsync(async (req, res, next) => {});
+const login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return next(new AppError("All fields are required", 400));
+
+  const user = await validateUser(email, password);
+  if (!user)
+    return next(new AppError("Email and Password dose not match", 400));
+
+  // Set Cookies
+  const token = await user.generateJWTToken();
+  user.password = undefined;
+  res.cookie("token", token, cookieOptions);
+
+  //Send Response
+  sendResponse(res, "User Loggedin successfully", user);
+});
 
 /////////////////////////////////////////////
 //LOGOUT CONTROLLER
