@@ -42,6 +42,16 @@ TextbookNest was created as a full-stack web application to showcase my skills i
    git clone https://github.com/yourusername/textbooknest.git
    cd textbooknest
    ```
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
 ## API Endpoints
 
