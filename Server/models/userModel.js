@@ -1,4 +1,7 @@
 import { model, Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import AppError from "../utils/AppError.js";
+import JWT from "jsonwebtoken";
 
 const userSchema = new Schema(
   {
@@ -41,6 +44,35 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
+
+/////////////////////////////////////////////
+//PASSWORD ENCRYPTION
+userSchema.pre("save", async function (next) {
+  try {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    return next();
+  } catch (error) {
+    return next(new AppError(error, 400));
+  }
+});
+
+/////////////////////////////////////////////
+//SET COOKISE
+userSchema.methods = {
+  // Generate JWT Token
+  generateJWTToken: async function () {
+    return JWT.sign(
+      {
+        id: this._id,
+        email: this.email,
+        role: this.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "90d" }
+    );
+  },
+};
 
 const User = model("User", userSchema);
 
